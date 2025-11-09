@@ -210,6 +210,7 @@ function mousePressed() {
       friction: 0,
   
       onCollide: function () {
+        if (this.collided) return;
         let pushDist = 500; // arbitrary value
         for (let other of engine._entities) {
           // skip items of no explosion
@@ -260,6 +261,7 @@ function mousePressed() {
         engine.removeEntity(this);
       },
     });
+    rocket.collided = false;
   
     engine.addEntity(rocket);
   }

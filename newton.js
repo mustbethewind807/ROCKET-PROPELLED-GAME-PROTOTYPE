@@ -293,9 +293,25 @@ const Newton = {
             case "addEntity":
               // Add entity
               this._entities.push(action.options.entity);
+
+              // stolen collision code from the land down under
+              // Check collisions
+              for (let other of this._entities) {
+                if (other === action.options.entity || other === undefined) continue;
+                let noCollide = false;
+                for (let tag of action.options.entity.noColl) {
+                  if (other.label === tag) {
+                    noCollide = true;
+                    break;
+                  }
+                }
+                if (noCollide) continue;
+                action.options.entity.collide(other);
+              }
               break;
-            default:
-              console.error(`Illegal action type: ${action.type}`);
+              // if no match error?
+              default:
+                  console.error(`Illegal action type: ${action.type}`);
           }
         }
 
