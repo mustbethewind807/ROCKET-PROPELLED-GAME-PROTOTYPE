@@ -248,6 +248,8 @@ function mousePressed() {
             dir = Vector.normalize(dir);
             dir = Vector.mult(dir, power);
             other.applyForce(dir);
+
+            if (other.label == 'player') console.log(power);
           }
         }
         stroke(0);
@@ -257,11 +259,10 @@ function mousePressed() {
         translate(-camera.pos.x + camera.halfw, -camera.pos.y + camera.halfh);
         circle(this.pos.x, this.pos.y, pushDist * 2);
         pop();
-  
+        this.collided = true;
         engine.removeEntity(this);
       },
     });
-    rocket.collided = false;
   
     engine.addEntity(rocket);
   }
