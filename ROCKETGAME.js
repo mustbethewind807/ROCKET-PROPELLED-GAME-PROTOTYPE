@@ -156,10 +156,17 @@ function draw() {
   engine.render(camera);
 
   // After engine stuff
+	// Render the crosshair(?)
+	push();
+	translate(MOUSE.x, MOUSE.y);
   stroke(0);
-  strokeWeight(8);
-  // point(mouseX, mouseY);
-  point(MOUSE.x, MOUSE.y);
+  strokeWeight(4);
+	// point(MOUSE.x, MOUSE.y);
+	line(0, 10, 0, 5);
+	line(0, -10, 0, -5);
+	line(10, 0, 5, 0);
+	line(-10, 0, -5, 0);
+	pop();
   
   if (player.rockets < 3) {
     player.rocketCharge++;

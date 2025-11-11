@@ -390,10 +390,12 @@ const Newton = {
         
 
           if (e.vel.x !== 0 && e.grounded) {
-            e.vel.x -= Math.sign(e.vel.x) * e.friction;
-            if (Math.abs(e.vel.x) < 0.1) {
-              e.vel.x = 0;
-            }
+						if (Math.sign(e.vel.x) * e.friction > Math.sign(e.vel.x)) e.vel.x = 0;
+						else e.vel.x -= Math.sign(e.vel.x) * e.friction;
+            // e.vel.x -= Math.sign(e.vel.x) * e.friction;
+            // if (Math.abs(e.vel.x) < 0.1) {
+              // e.vel.x = 0;
+            // }
           }
         }
 
