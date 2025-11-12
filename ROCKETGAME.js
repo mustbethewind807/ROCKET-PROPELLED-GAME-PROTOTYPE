@@ -69,6 +69,8 @@ function setup() {
     },
   });
 
+	player.healingCooldown = 0;
+
   let floor = Entity.create({
     pos: Vector.create(0, 300),
     w: 100,
@@ -154,6 +156,13 @@ function draw() {
   engine.update();
   camera.update();
   engine.render(camera);
+	
+	// important player stuff
+	if (player.healingCooldown > 0) {
+		player.healingCooldown--;
+	} else {
+		if (player.health < 100) player.health++;
+	}
 
   // After engine stuff
 	// Render the crosshair(?)
@@ -198,6 +207,7 @@ function draw() {
     text(`Health: ${player.health}`, width - 32, 50);
     text(`Rockets: ${player.rockets}`, width - 32, 75);
     text(`Rocket charge: ${player.rocketCharge}`, width - 32, 100);
+		text(`Healing cooldown: ${player.healingCooldown}`, width - 32, 125);
   }
 }
 
@@ -256,7 +266,15 @@ function mousePressed() {
             dir = Vector.mult(dir, power);
             other.applyForce(dir);
 
-            if (other.label == 'player') console.log(power);
+            if (other.label == 'player') {
+							let damage = 20 * Math.pow(1 - percentage, 6);
+							damage = Math.ceil(damage);
+							other.health -= damage;
+
+							let cooldown = 150 * Math.pow(1 - percentage, 0.35);
+							cooldown = Math.floor(cooldown);
+							other.healingCooldown = Math.max(cooldown, other.healingCooldown);
+						}
           }
         }
         stroke(0);
