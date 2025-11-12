@@ -165,7 +165,7 @@ const Newton = {
       entity.health = 100;
       entity.rockets = 3;
       entity.rocketCharge = 0;
-      entity.rocketChargeLimit = 300; // In frames, should be 300
+      entity.rocketChargeLimit = 1; // In frames, should be 300
       entity.facing = { x: 0, y: 0 };
 
       // Important engine running stuff
@@ -390,33 +390,10 @@ const Newton = {
         
 
           if (e.vel.x !== 0 && e.grounded) {
-						if (Math.sign(e.vel.x) * e.friction > Math.sign(e.vel.x)) e.vel.x = 0;
+						if (Math.abs(e.vel.x) < e.friction) e.vel.x = 0;
 						else e.vel.x -= Math.sign(e.vel.x) * e.friction;
-            // e.vel.x -= Math.sign(e.vel.x) * e.friction;
-            // if (Math.abs(e.vel.x) < 0.1) {
-              // e.vel.x = 0;
-            // }
-          }
-        }
-
-        //   for (let other of this._entities) {
-        //     // don't collide with yourself
-        //     if (other === e || other === undefined) continue;
-        //     // don't collide with things of no colliding
-        //     let noCollide = false;
-        //     for (let tag of e.noColl) {
-        //       if (other.label === tag) {
-        //         noCollide = true;
-        //         break;
-        //       }
-        //     }
-        //     if (noCollide) continue;
-        //     // collision time
-        //     e.collide(other);
-        //   }
-        // }
-
-        // Action time
+					}
+				}
         this.runActions();
       };
 
