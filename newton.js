@@ -1,3 +1,5 @@
+// my garbage game engine that i made specifically for this project
+
 // define a namespace
 const Newton = {
   Vector: {},
