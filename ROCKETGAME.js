@@ -224,6 +224,7 @@ function draw() {
       32,
       125
     );
+		text(`Can jump: ${player.canJump}`, 32, 150);
 
     textAlign(RIGHT, CENTER);
     text(`Health: ${player.health}`, width - 32, 50);
@@ -262,8 +263,6 @@ function mousePressed() {
         translate(-camera.pos.x + camera.halfw, -camera.pos.y + camera.halfh);
         circle(this.pos.x, this.pos.y, this.pushDist * 2);
         pop();
-        this.collided = true;
-        engine.removeEntity(this);
       },
     });
 		rocket.lifespan = 480;
@@ -322,6 +321,7 @@ function mousePressed() {
 							engine.removeEntity(other);
 						}
           }
+				engine.removeEntity(this);
 			}
 		}
     engine.addEntity(rocket);
@@ -329,7 +329,7 @@ function mousePressed() {
 		// freeze rockets
 		for (let e of engine._entities) {
 			if (!e.label == 'rocket') continue;
-			e.freezeTime = 180;
+			if (e.freezeTime == 0) e.freezeTime = 180;
 		}
 	}
 }
