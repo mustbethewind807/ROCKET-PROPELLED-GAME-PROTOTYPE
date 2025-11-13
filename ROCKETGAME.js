@@ -176,7 +176,29 @@ function draw() {
 	line(10, 0, 5, 0);
 	line(-10, 0, -5, 0);
 	pop();
-  
+
+	// update rockets' lifespan
+	for (let e of engine._entities) {
+		if (!(e.label == 'rocket')) continue;
+		// reduce lifespan
+		e.lifespan--;
+		if (e.lifespan < 0) {
+			// explode
+			e.onCollide();
+		}
+
+		// rocket freeze logic
+		if (e.freezeTime > 0) {
+			e.freezeTime--;
+			if (e.freezeTime == 0) {
+				Vector.set(e.vel, e.actualVel.x, e.actualVel.y);
+			} else {
+				Vector.set(e.vel, 0, 0);
+			}
+		}
+	}
+
+	// rocket logic
   if (player.rockets < 3) {
     player.rocketCharge++;
   }
@@ -218,24 +240,43 @@ function mousePressed() {
     player.rockets--;
     let rocket = Entity.create({
       pos: Vector.add(player.pos, Vector.mult(player.facing, 1.5)),
-      vel: Vector.copy(player.facing),
+      vel: Vector.add(player.facing, player.vel),
       w: 16,
       h: 16,
       gravityAffected: false,
       label: 'rocket',
-      noColl: ['rocket'],
+      noColl: [],
       friction: 0,
   
       onCollide: function () {
         if (this.collided) return;
-        let pushDist = 500; // arbitrary value
-        for (let other of engine._entities) {
-          // skip items of no explosion
-          if (other.label == 'rocket') continue;
-          if (other.isStatic) continue;
-          
-          // collides with explosion
-          let testX, testY;
+         // collides with explosion
+				rocket.explode(engine);
+
+				// render explosion
+				// sloppy, add the engine.effect class later
+        stroke(0);
+        strokeWeight(2);
+        noFill();
+        push();
+        translate(-camera.pos.x + camera.halfw, -camera.pos.y + camera.halfh);
+        circle(this.pos.x, this.pos.y, this.pushDist * 2);
+        pop();
+        this.collided = true;
+        engine.removeEntity(this);
+      },
+    });
+		rocket.lifespan = 480;
+		rocket.freezeTime = 0;
+		rocket.actualVel = Vector.copy(rocket.vel);
+		rocket.pushDist = 500;
+		rocket.explode = function (engine) {
+			if (this.collided) return;
+			this.collided = true;
+			for (let other of engine._entities) {
+				if (other.isStatic) continue;
+
+				let testX, testY;
           if (this.pos.x < other.pos.x - other.halfw) {
             testX = other.pos.x - other.halfw;
           } else if (this.pos.x > other.pos.x + other.halfw) {
@@ -256,11 +297,11 @@ function mousePressed() {
           let distY = this.pos.y - testY;
           let distSq = (distX * distX) + (distY * distY);
           
-          if (distSq < (pushDist * pushDist)) {
+          if (distSq < (this.pushDist * this.pushDist)) {
             // push
             let dir = Vector.sub(other.pos, this.pos);
             let dist = Math.sqrt(distSq);
-            let percentage = dist / pushDist;
+            let percentage = dist / this.pushDist;
             let power = lerp(10, 0, percentage);
             dir = Vector.normalize(dir);
             dir = Vector.mult(dir, power);
@@ -275,22 +316,22 @@ function mousePressed() {
 							cooldown = Math.floor(cooldown);
 							other.healingCooldown = Math.max(cooldown, other.healingCooldown);
 						}
+
+						if (other.label == 'rocket') {
+							other.explode(engine);
+							engine.removeEntity(other);
+						}
           }
-        }
-        stroke(0);
-        strokeWeight(2);
-        noFill();
-        push();
-        translate(-camera.pos.x + camera.halfw, -camera.pos.y + camera.halfh);
-        circle(this.pos.x, this.pos.y, pushDist * 2);
-        pop();
-        this.collided = true;
-        engine.removeEntity(this);
-      },
-    });
-  
+			}
+		}
     engine.addEntity(rocket);
-  }
+  } else if (mouseButton == RIGHT) {
+		// freeze rockets
+		for (let e of engine._entities) {
+			if (!e.label == 'rocket') continue;
+			e.freezeTime = 180;
+		}
+	}
 }
 
 function doubleClicked() {
