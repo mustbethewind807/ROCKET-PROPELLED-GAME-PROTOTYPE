@@ -75,6 +75,11 @@ const Newton = {
     Vector.copy = function (v) {
       return { x: v.x, y: v.y };
     };
+
+		Vector.set = function (v, a, b) {
+			v.x = a;
+			v.y = b;
+		}
   })();
 
   // Camera module
