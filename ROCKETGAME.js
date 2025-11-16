@@ -264,11 +264,29 @@ function mousePressed() {
         circle(this.pos.x, this.pos.y, this.pushDist * 2);
         pop();
       },
+
+			render: function () {
+				if (this.freezeTime <= 0) {
+					rectMode(CENTER);
+					noFill();
+					stroke(0);
+					strokeWeight(2);
+					rect(this.pos.x, this.pos.y, this.w, this.h);
+				} else {
+					let c = lerpColor(color(255, 255, 255), color(0, 0, 255), this.freezeTime / 180);
+					rectMode(CENTER);
+					stroke(0);
+					strokeWeight(2);
+					fill(c);
+					rect(this.pos.x, this.pos.y, this.w, this.h);
+				}
+			}
     });
 		rocket.lifespan = 480;
 		rocket.freezeTime = 0;
 		rocket.actualVel = Vector.copy(rocket.vel);
 		rocket.pushDist = 500;
+		rocket.hasBeenFrozen = false;
 		rocket.explode = function (engine) {
 			if (this.collided) return;
 			this.collided = true;
@@ -328,8 +346,9 @@ function mousePressed() {
   } else if (mouseButton == RIGHT) {
 		// freeze rockets
 		for (let e of engine._entities) {
-			if (!e.label == 'rocket') continue;
+			if (!e.label == 'rocket' || e.hasBeenFrozen) continue;
 			if (e.freezeTime == 0) e.freezeTime = 180;
+			e.hasBeenFrozen = true;
 		}
 	}
 }
